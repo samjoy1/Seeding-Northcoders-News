@@ -14,7 +14,7 @@ afterAll(() => {
   return db.end()
 })
 
-describe.only("GET /api", () => {
+describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
       .get("/api")
@@ -23,5 +23,26 @@ describe.only("GET /api", () => {
         expect(endpoints).toEqual(endpointsJson);
         console.log(endpoints)
       });
+  });
+});
+
+describe("GET /api/topics", () => {
+  test("returns a 200 status and an array of topic objects", () => {
+    return request(app)
+    .get("/api/topics")
+    .expect(200)
+    .then((response) => {
+    
+     
+    expect(Array.isArray(response.body.topics)).toBe(true);
+    
+   
+    expect(response.body.topics).toHaveLength(3);
+    console.log(response.body.topics)
+    
+  
+    expect(response.body.topics[0]).toHaveProperty("slug", "mitch");
+    expect(response.body.topics[0]).toHaveProperty("description", "The man, the Mitch, the legend");
+    })
   });
 });
