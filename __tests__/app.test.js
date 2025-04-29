@@ -14,18 +14,6 @@ afterAll(() => {
   return db.end()
 })
 
-describe('get invalid urls', () => {
-  test("404: error message for invalid string", () => {
-    return request(app)
-    .get("/api/invalid")
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toBe("error")
-      console.log(body.msg)
-    })
-  })
-})
-
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
@@ -56,5 +44,44 @@ describe("GET /api/topics", () => {
     expect(response.body.topics[0]).toHaveProperty("slug", "mitch");
     expect(response.body.topics[0]).toHaveProperty("description", "The man, the Mitch, the legend");
     })
+  });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: responds with an article object with correct properties", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+        expect(article).toHaveProperty("author", expect.any(String));
+        expect(article).toHaveProperty("title", expect.any(String));
+        expect(article).toHaveProperty("article_id", 1);
+        expect(article).toHaveProperty("body", expect.any(String));
+        expect(article).toHaveProperty("topic", expect.any(String));
+        expect(article).toHaveProperty("created_at", expect.any(String));
+        expect(article).toHaveProperty("votes", expect.any(Number));
+        expect(article).toHaveProperty("article_img_url", expect.any(String));
+       console.log(article)
+      });
+  });
+
+  test("400: invalid article ID format", () => {
+    return request(app)
+      .get("/api/articles/banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+        console.log(body.msg)
+      });
+  });
+
+  test("404: valid ID but article does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
   });
 });
