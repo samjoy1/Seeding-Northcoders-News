@@ -9,4 +9,8 @@ app.get("/api", getApi)
 
 app.get("/api/topics", getTopics)
 
+app.get('/*splat', (req, res) => {
+    res.status(404).send({msg: 'error'})
+})
+
 module.exports = app

@@ -14,6 +14,18 @@ afterAll(() => {
   return db.end()
 })
 
+describe('get invalid urls', () => {
+  test("404: error message for invalid string", () => {
+    return request(app)
+    .get("/api/invalid")
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("error")
+      console.log(body.msg)
+    })
+  })
+})
+
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
