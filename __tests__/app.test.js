@@ -4,7 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data"); 
 const endpointsJson = require("../endpoints.json");
-
+require('jest-sorted');
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => {
   return seed(data)
@@ -82,6 +82,31 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: should return an array of article objects with properties: author, title, article_id, topic, created_at, votes, article_img_url and comment_count - this is the total count of comments referencing this article_id", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then( ( {body} ) => {
+        expect(Array.isArray(body.articles)).toBe(true)
+        expect(body.articles).toHaveLength(13)
+        expect(body.articles).toBeSortedBy("created_at", {descending: true})
+        body.articles.forEach((article) => {
+          expect(article).toHaveProperty("author")
+          expect(article).toHaveProperty("title")
+          expect(article).toHaveProperty("article_id")
+          expect(article).toHaveProperty("topic")
+          expect(article).toHaveProperty("created_at")
+          expect(article).toHaveProperty("votes")
+          expect(article).toHaveProperty("article_img_url")
+          expect(article).toHaveProperty("comment_count")
+          expect(typeof article.comment_count).toBe("number")
+          expect(article.comment_count).toBeGreaterThanOrEqual(0)
+        })
       });
   });
 });
