@@ -44,6 +44,7 @@ exports.selectCommentsByArticleId = (article_id) => {
         = $1 ORDER BY created_at DESC`, [article_id]
     )
     .then((result) => {
+        console.log(result.rows)
         return result.rows
     })
 }

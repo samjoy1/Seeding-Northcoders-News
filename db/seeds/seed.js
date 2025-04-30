@@ -1,6 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
-const { convertTimestampToDate, createRef  } = require("./utils");
+const { convertTimestampToDate, createRef, createArticlesLookupObj  } = require("./utils");
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
@@ -91,17 +91,19 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     });
     const InsertArticlesQuery = format(
       `INSERT INTO articles(title, topic, author, body, created_at, votes, article_img_url)
-      VALUES %L;`,
+      VALUES %L RETURNING *;`,
       formattedArticles
     );
     return db.query(InsertArticlesQuery);
   })
   .then((result) => {
-    const articlesRefObject = createRef(result.rows);
+    const articlesLookup = createArticlesLookupObj(result.rows);
+
+
     const formattedComments = commentData.map((comment) => {
       const legitComment = convertTimestampToDate(comment);
       return [
-        articlesRefObject[comment.article_title],
+        articlesLookup[legitComment.article_title],
         legitComment.body,
         legitComment.votes,
         legitComment.author,
