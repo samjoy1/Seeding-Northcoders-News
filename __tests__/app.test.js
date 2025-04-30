@@ -108,7 +108,7 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("200: responds with an array of comments for the given article_id, sorted by date descending", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -160,4 +160,48 @@ describe.only("GET /api/articles/:article_id/comments", () => {
     })
   })
 
+});
+
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a test comment!",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        console.log(body.comment)
+        expect(body.comment).toBe("This is a test comment!");
+      });
+  });
+
+  test("400: missing username or body", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "butter_bridge" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing required fields");
+      });
+  });
+
+  test("404: posting to a non-existent article", () => {
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send({ username: "butter_bridge", body: "test" })
+      .expect(404);
+  });
+
+  test("400: invalid article_id", () => {
+    return request(app)
+      .post("/api/articles/not-a-number/comments")
+      .send({ username: "butter_bridge", body: "Invalid ID test" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
 });

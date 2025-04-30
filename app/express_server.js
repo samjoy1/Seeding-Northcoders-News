@@ -1,7 +1,7 @@
 const express =  require("express")
 const app = express()
 const db = require("../db/connection")
-const { getApi, getTopics, getArticleById, getArticles, getCommentsByArticleId} = require("../app/news.controller")
+const { getApi, getTopics, getArticleById, getArticles, getCommentsByArticleId, postCommentByArticleId} = require("../app/news.controller")
 
 app.use(express.json())
 
@@ -14,6 +14,8 @@ app.get("/api/topics", getTopics)
 app.get("/api/articles/:article_id", getArticleById)
 
 app.get("/api/articles", getArticles)
+
+app.post("/api/articles/:article_id/comments", postCommentByArticleId)
 
 
 app.use((err, req, res, next) => {
