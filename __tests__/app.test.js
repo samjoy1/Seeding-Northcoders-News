@@ -21,7 +21,6 @@ describe("GET /api", () => {
       .expect(200)
       .then(({ body: { endpoints } }) => {
         expect(endpoints).toEqual(endpointsJson);
-        console.log(endpoints)
       });
   });
 });
@@ -38,7 +37,6 @@ describe("GET /api/topics", () => {
     
    
     expect(response.body.topics).toHaveLength(3);
-    console.log(response.body.topics)
     
   
     expect(response.body.topics[0]).toHaveProperty("slug", "mitch");
@@ -62,7 +60,6 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toHaveProperty("created_at", expect.any(String));
         expect(article).toHaveProperty("votes", expect.any(Number));
         expect(article).toHaveProperty("article_img_url", expect.any(String));
-       console.log(article)
       });
   });
 
@@ -111,12 +108,14 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe("GET /api/articles/:article_id/comments", () => {
+describe.only("GET /api/articles/:article_id/comments", () => {
   test("200: responds with an array of comments for the given article_id, sorted by date descending", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
+        console.log(body.comments)
+        expect(body.comments.length).toBe(11)
         expect(Array.isArray(body.comments)).toBe(true);
         body.comments.forEach((comment) => {
           expect(comment).toEqual(
@@ -139,7 +138,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/banana/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid article ID");
+        expect(body.msg).toBe("Invalid input");
       });
   });
 
@@ -151,4 +150,14 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.comments).toEqual([]);
       });
   });
+
+  test("404: valid but non-existent article ", () => {
+    return request(app)
+    .get("/api/articles/9999/comments")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Article not found")
+    })
+  })
+
 });

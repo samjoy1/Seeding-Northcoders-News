@@ -34,13 +34,11 @@ exports.getArticles = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params
-
-    if (isNaN(article_id)) {
-        return res.status(400).send({msg: "Invalid article ID"})
-    }
-
-    selectCommentsByArticleId(article_id)
-    .then((comments) => {
+    const pendingArticleById = selectArticleById(article_id)
+    const pendingCommentsById = selectCommentsByArticleId(article_id)
+    
+    Promise.all([pendingCommentsById, pendingArticleById])
+    .then(([comments]) => {
         res.status(200). send ({ comments })
     })
     .catch(next)
