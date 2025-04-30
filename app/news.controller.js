@@ -1,4 +1,4 @@
-const {selectTopics, selectArticleById, selectArticles, selectCommentsByArticleId, insertCommentByArticleId} = require("../app/news.model")
+const {selectTopics, selectArticleById, selectArticles, selectCommentsByArticleId, insertCommentByArticleId, updateArticleById} = require("../app/news.model")
 const endpoints =  require("../endpoints.json")
 
 
@@ -61,4 +61,18 @@ exports.postCommentByArticleId = (req, res, next) => {
     res.status(201).send({comment: comment.body})
   })
   .catch(next)
+}
+
+exports.patchArticleById = (req, res, next) => {
+    const { article_id } = req.params
+    const {inc_votes} = req.body
+    if (typeof inc_votes !== "number") {
+        return res.status(400).send({msg: "Invalid inc_votes value"})
+    }
+
+    updateArticleById(article_id, inc_votes)
+    .then((updatedArticle) => {
+        res.status(200).send({ article: updatedArticle})
+    })
+    .catch(next)
 }
