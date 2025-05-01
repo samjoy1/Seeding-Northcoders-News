@@ -206,7 +206,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("PATCH /api/articles/:article_id", () => {
+describe("PATCH /api/articles/:article_id", () => {
   test("200: increments the vote count and returns the updated article", () => {
     return request(app)
       .patch("/api/articles/1")
@@ -285,6 +285,32 @@ describe.only("PATCH /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: deletes a comment successfully", () => {
+    return request(app)
+      .delete("/api/comments/1") 
+      .expect(204);
+  });
+
+  test("404: comment not found", () => {
+    return request(app)
+      .delete("/api/comments/9999") 
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment not found");
+      });
+  });
+
+  test("400: invalid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
       });
   });
 });
