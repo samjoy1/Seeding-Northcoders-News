@@ -25,7 +25,9 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    selectArticles()
+   const { sort_by, order} = req.query
+    
+   selectArticles(sort_by, order)
     .then((articles) => {
         res.status(200).send({articles})
     })
@@ -39,7 +41,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
     
     Promise.all([pendingCommentsById, pendingArticleById])
     .then(([comments]) => {
-        res.status(200). send ({ comments })
+        res.status(200).send ({ comments })
     })
     .catch(next)
 }
@@ -89,7 +91,7 @@ exports.deleteCommentById = (req, res, next) => {
 exports.getUsers = (req, res, next) => {
     selectUsers()
     .then((users) => {
-        res.status(200).send(({ users }))
+        res.status(200).send({ users })
     })
     .catch(next)
 }
