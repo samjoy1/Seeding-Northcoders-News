@@ -314,3 +314,32 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("200: responds with an array of user objects with correct properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.users)).toBe(true);
+        expect(body.users.length).toBeGreaterThan(0);
+        body.users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("404: responds with an error for invalid path", () => {
+    return request(app)
+      .get("/api/userz") 
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found");
+      });
+  });
+});
