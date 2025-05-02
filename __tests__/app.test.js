@@ -13,7 +13,6 @@ beforeEach(() => {
 afterAll(() => {
   return db.end()
 })
-
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
@@ -79,7 +78,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid input");
-        console.log(body.msg)
+        
       });
   });
 
@@ -124,7 +123,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        console.log(body.comments)
         expect(body.comments.length).toBe(11)
         expect(Array.isArray(body.comments)).toBe(true);
         body.comments.forEach((comment) => {
@@ -183,7 +181,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        console.log(body.comment)
         expect(body.comment).toBe("This is a test comment!");
       });
   });
