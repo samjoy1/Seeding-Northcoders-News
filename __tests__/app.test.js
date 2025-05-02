@@ -381,3 +381,37 @@ describe("GET /api/articles with queries", () => {
       });
   });
 });
+
+describe("GET /api/articles?topic=...", () => {
+  test("200: responds with only articles matching a valid topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch") 
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBeGreaterThan(0);
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("topic", "mitch");
+        });
+      });
+  });
+
+  test("200: responds with an empty array if topic exists but no articles under it", () => {
+    return request(app)
+      .get("/api/articles?topic=paper") 
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([]);
+      });
+  });
+
+  test("404: responds with 'Topic not found' for a non-existent topic", () => {
+    return request(app)
+      .get("/api/articles?topic=notarealtopic")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Topic not found");
+      });
+  });
+});
