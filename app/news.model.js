@@ -21,12 +21,12 @@ exports.selectArticleById = (article_id) => {
 }
 
 const validSortBy = [
-    "author", "title", "article_id", "topic", "created_at", "votes", "article_img_url", "comment_count"
+    "author", "title", "article_id", "topic", "created_at", "votes", "article_img_url", "comment_count", "topic"
   ]
 
 const validOrder = ["asc", "desc"]
 
-exports.selectArticles = (sort_by = "created_at", order = "desc") => {
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
     if(!validSortBy.includes(sort_by)) {
         return Promise.reject({ status: 400, msg: "Invalid sort_by query"})
     }
@@ -35,16 +35,34 @@ exports.selectArticles = (sort_by = "created_at", order = "desc") => {
         return Promise.reject({ status: 400, msg: "Invalid order query"})
     }
     
-    const queryStr =
+    const queryValues = []
+    let queryStr =
         `SELECT articles.author, articles.title, 
         articles.article_id, articles.topic, articles.created_at, 
         articles.votes, articles.article_img_url, COUNT(comments.comment_id) :: INT 
         AS comment_count FROM articles 
-        LEFT JOIN comments ON articles.article_id = comments.article_id 
-        GROUP BY articles.article_id 
-        ORDER BY ${sort_by} ${order.toUpperCase()}`;
-    
-    return db.query(queryStr).then((result) => result.rows)
+        LEFT JOIN comments ON articles.article_id = comments.article_id `;
+
+        if(topic) {
+            queryStr += `WHERE articles.topic = $1`
+            queryValues.push(topic)
+        }
+
+        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
+
+    return db.query(queryStr, queryValues).then((result) => {
+        if (topic && result.rows.length === 0) {
+            return db.query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+            .then(({ rows }) => {
+                if (rows.length === 0) {
+                    return Promise.reject({ status: 404, msg: "Topic not found"})
+                } else {
+                    return []
+                }
+            })
+        }
+        return result.rows
+    })
 }
 
 exports.selectCommentsByArticleId = (article_id) => {
