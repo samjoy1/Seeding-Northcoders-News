@@ -60,8 +60,18 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toHaveProperty("created_at", expect.any(String));
         expect(article).toHaveProperty("votes", expect.any(Number));
         expect(article).toHaveProperty("article_img_url", expect.any(String));
+        expect(article).toHaveProperty("comment_count", expect.any(Number))
       });
-  });
+    });
+
+    test("200: comment_count is 0 when the article has no comments", () => {
+      return request(app)
+        .get("/api/articles/2") 
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.comment_count).toBe(0);
+        });
+    });
 
   test("400: invalid article ID format", () => {
     return request(app)
