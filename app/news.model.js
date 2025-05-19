@@ -44,7 +44,7 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
         LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
         if(topic) {
-            queryStr += `WHERE articles.topic = $1`
+            queryStr += `WHERE articles.topic = $1 `
             queryValues.push(topic)
         }
 
