@@ -4,16 +4,7 @@ const { convertTimestampToDate, createRef, createArticlesLookupObj  } = require(
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
-  .query(`DROP TABLE IF EXISTS comments;`) 
-  .then(() => {
-    return db.query(`DROP TABLE IF EXISTS articles`);
-  })
-  .then(() => {
-    return db.query(`DROP TABLE IF EXISTS users`);
-  })
-  .then(() => {
-    return db.query(`DROP TABLE IF EXISTS topics`);
-  })
+  .query(`DROP TABLE IF EXISTS comments, articles, users, topics CASCADE;`)
   .then(() => {
     return db.query(`CREATE TABLE topics (
       slug VARCHAR PRIMARY KEY,

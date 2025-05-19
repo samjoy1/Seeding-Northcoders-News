@@ -2,7 +2,9 @@ const express =  require("express")
 const app = express()
 const db = require("../db/connection")
 const { getApi, getTopics, getArticleById, getArticles, getCommentsByArticleId, postCommentByArticleId, patchArticleById, deleteCommentById, getUsers} = require("../app/news.controller")
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json())
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId)
